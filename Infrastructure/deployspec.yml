@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Sterted syncing templates to S3
+      - aws s3 sync ./Infrastructure s3://ghost-blog-templates/
+      - echo Finished syncing templates to S3
+
+artifacts:
+  files:
+    - 'Infrastructure/ghost_infra.yml'

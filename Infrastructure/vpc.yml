@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC for ecs test
+
+Resources:
+
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+
+  GhostPrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: '10.0.4.0/24'
+      MapPublicIpOnLaunch: false
+  
+  GhostPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: '10.0.3.0/24'
+      MapPublicIpOnLaunch: false
+
+  GhostPublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: '10.0.1.0/24'
+      MapPublicIpOnLaunch: true
+  
+  GhostPublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: '10.0.2.0/24'
+      MapPublicIpOnLaunch: true
+
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+
+  VPCGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+
+  RouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref GhostPublicSubnet1
+      RouteTableId: !Ref RouteTable
+  
+  RouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref GhostPublicSubnet2
+      RouteTableId: !Ref RouteTable
+
+  InternetRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+
+Outputs:
+
+  VPC:
+    Description: VPC
+    Value: !Ref VPC
+    Export:
+      Name: 'VPC'
+
+  GhostPrivateSubnet1:
+    Description: 'GhostPrivateSubnet1 on AZ1'
+    Value: !Ref GhostPrivateSubnet1
+    Export:
+      Name: 'GhostPrivateSubnet1'
+  
+  GhostPrivateSubnet2:
+    Description: 'GhostPrivateSubnet2 on AZ1'
+    Value: !Ref GhostPrivateSubnet2
+    Export:
+      Name: 'GhostPrivateSubnet2'
+
+  GhostPublicSubnet1:
+    Description: 'GhostPublicSubnet1 on AZ2'
+    Value: !Ref GhostPublicSubnet1
+    Export:
+      Name: 'GhostPublicSubnet1'
+  
+  GhostPublicSubnet2:
+    Description: 'GhostPublicSubnet2 on AZ2'
+    Value: !Ref GhostPublicSubnet2
+    Export:
+      Name: 'GhostPublicSubnet2'
+
+# deploy the stack
+# aws cloudformation deploy --template-file Infrastructure/vpc.yml --stack-name vpc --capabilities CAPABILITY_IAM

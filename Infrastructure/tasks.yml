@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: container on ecs cluster
+
+Resources:
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ghost-blog-task
+      Cpu: 1024
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name: ghost_blog
+          Image: !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]
+          Environment:
+            - Name: url
+              Value: http://random-dev-domain.com/
+            - Name: database__connection__host
+              Value: !ImportValue DBAddress
+            - Name: database__connection__user
+              Value: !Sub ['{{resolve:secretsmanager:${SecretsManagerRDS}::username}}', SecretsManagerRDS: !ImportValue SecretsManagerRDS]
+            - Name: database__connection__password
+              Value: !Sub ['{{resolve:secretsmanager:${SecretsManagerRDS}::password}}', SecretsManagerRDS: !ImportValue SecretsManagerRDS]
+            - Name: database__connection__database
+              Value: !ImportValue DBName
+          Cpu: 1024
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: 2368
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: 'apis'
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'ghost-blog'
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: ghost-blog-service
+      TaskDefinition: !Ref Task
+      Cluster: !ImportValue 'ECSCluster'
+      LaunchType: FARGATE
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !ImportValue GhostPublicSubnet1
+          SecurityGroups:
+            - !ImportValue ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: ghost_blog
+          ContainerPort: 2368
+          TargetGroupArn: !ImportValue GhostBlogTargetGroup
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: AmazonECSTaskExecutionRolePolicy
+          PolicyDocument:
+            Statement:
+            - Effect: Allow
+              Action:
+                # ECS Tasks to download images from ECR
+                - 'ecr:GetAuthorizationToken'
+                - 'ecr:BatchCheckLayerAvailability'
+                - 'ecr:GetDownloadUrlForLayer'
+                - 'ecr:BatchGetImage'
+                # ECS tasks to upload logs to CloudWatch
+                - 'logs:CreateLogStream'
+                - 'logs:PutLogEvents'
+              Resource: '*'
+
+
+Outputs:
+
+  ApiEndpoint:
+    Description: Ghost Blog API Endpoint
+    Value: !Join ['', ['http://', !ImportValue ELBDomainName, '/']]
+    Export:
+      Name: 'GhostBlog'
+
+# deploy the stack
+# aws cloudformation deploy --template-file Infrastructure/tasks.yml --stack-name ghost-blog-task --capabilities CAPABILITY_IAM

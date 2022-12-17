@@ -1,0 +1,42 @@
+# stackusing all the ghost templates
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/vpc.yml
+
+  ECS:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - VPC
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/ecs.yml
+
+  TaskDefinition:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RDS
+      - ECS
+      - VPC
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/tasks.yml
+
+  RDS:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - VPC
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/rds.yml
+
+  Route53:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - ECS
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/route53.yml
+
+# deploy ghost stack
+# aws cloudformation deploy --template-file Infrastructure/ghost_stack.yml --stack-name ghost-blog --capabilities CAPABILITY_IAM

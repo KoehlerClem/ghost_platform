@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+# create ecr repository
+Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ghost-blog
+
+Outputs:
+  ECRRepository:
+    Value: !GetAtt ECRRepository.RepositoryUri
+    Export:
+      Name: 'ECRRepositoryRepositoryUri'
+
+# deploy ecr.yml
+# aws cloudformation deploy --template-file Infrastructure/ecr.yml --stack-name ghost-blog-ecr

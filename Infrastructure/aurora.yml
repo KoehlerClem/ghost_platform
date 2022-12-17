@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  GlobalClusterIdentifier:
+    Type: String
+    Description: Identifier used for global database cluster
+    AllowedPattern: '^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$'
+Resources:
+  GlobalCluster:
+    Type: 'AWS::RDS::GlobalCluster'
+    Properties:
+      GlobalClusterIdentifier: !Ref GlobalClusterIdentifier
+      SourceDBClusterIdentifier: !Ref RDSCluster
+  RDSCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      MasterUsername: username
+      MasterUserPassword: password123321
+      Engine: aurora-mysql
+      EngineVersion: 8.0.23.mysql_aurora.3.02.2
+  RDSDBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      Engine: aurora-mysql
+      DBClusterIdentifier: !Ref RDSCluster
+      PubliclyAccessible: 'false'
+      DBInstanceClass: db.t2.micro

@@ -1,0 +1,13 @@
+# create s3 bucket ghost-blog-templates
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 bucket for storing cloudformation templates
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ghost-blog-templates
+
+# deploy s3 bucket ghost-blog-templates
+# aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-s3
