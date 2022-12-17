@@ -15,71 +15,13 @@ Parameters:
     AllowedPattern: '[A-Za-z0-9-]+'
     Default: main
 Resources:
-  
-  CodePipelineArtifactStore:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      VersioningConfiguration:
-        Status: Enabled
-  
-  CodePipelineWebhook:
-    Type: 'AWS::CodePipeline::Webhook'
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: >-
-          {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
-      RegisterWithThirdParty: 'true'
-      Filters:
-        - JsonPath: $.ref
-          MatchEquals: 'refs/heads/{Branch}'
-        - JsonPath: $.repository.name
-          MatchEquals: '{Repo}'
-      TargetPipeline: !Ref CodePipeline
-      TargetAction: Source
-      TargetPipelineVersion: !GetAtt 
-        - CodePipeline
-        - Version
-  
-  CodePipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
-    Properties:
-      Name: !Ref 'AWS::StackName'
-      RoleArn: !GetAtt [PipelineRole, Arn]
-      ArtifactStore:
-        Type: S3
-        Location: !Ref CodePipelineArtifactStore
-      Stages:
-        - Name: GitHubSource
-          Actions:
-            - Name: Source
-              ActionTypeId:
-                Category: Source
-                Owner: ThirdParty
-                Version: 1
-                Provider: GitHub
-              Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: Ghost
-                Branch: !Ref GitHubBranch
-                PollForSourceChanges: false
-                # OutputArtifactFormat: CODEBUILD_CLONE_REF
-                OAuthToken: >-
-                  {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
-              OutputArtifacts:
-                - Name: SourceCode
-        - Name: BuildAndDeployGhostImage
-          Actions:
-            - Name: Build
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Provider: CodeBuild
-                Version: '1'
-              Configuration:
-                ProjectName: !Ref BuildAndDeployGhostImage
-              InputArtifacts:
-                - Name: SourceCode
+
+  CodeBuildSourceCredential:
+    Type: 'AWS::CodeBuild::SourceCredential'
+    Properties: 
+      Token: '{{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}'
+      ServerType: GITHUB
+      AuthType: PERSONAL_ACCESS_TOKEN
 
   BuildAndDeployGhostImage:  
     Type: 'AWS::CodeBuild::Project'
@@ -87,13 +29,24 @@ Resources:
       Name: !Sub '${AWS::StackName}-deploy-dev'
       ServiceRole: !Ref CodeBuildServiceRole
       Source:
-        Type: CODEPIPELINE
-        BuildSpec: ./Infrastructure/deployspec_app.yml
+        Type: GITHUB
+        Location: !Sub 'https://github.com/${GitHubOwner}/${GitHubRepository}.git'
+        BuildSpec: ./deployspec_app.yml
+        Auth:
+          Type: OAUTH
+          Resource: !Ref CodeBuildSourceCredential
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: HEAD_REF
+              Pattern: !Sub '^refs/heads/${GitHubBranch}$'
       Artifacts:
-        Type: CODEPIPELINE
+        Type: NO_ARTIFACTS
       Environment:
         Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_SMALL
+        ComputeType: BUILD_GENERAL1_MEDIUM
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
         PrivilegedMode: true
 
@@ -118,36 +71,6 @@ Resources:
                   - 's3:*'
                 Resource:
                   - '*'
-
-  PipelineRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: codepipeline.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/AdministratorAccess
-  
-  CloudformationRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: cloudformation.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/AdministratorAccess
 
 # deply codepipeline
 # aws cloudformation deploy --template-file Infrastructure/codepipeline_app.yml --stack-name ghost-infra-pipeline --capabilities CAPABILITY_IAM
