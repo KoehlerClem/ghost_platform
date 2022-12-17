@@ -60,7 +60,7 @@ Resources:
                 Provider: GitHub
               Configuration:
                 Owner: !Ref GitHubOwner
-                Repo: !Ref GitHubRepository
+                Repo: Ghost
                 Branch: !Ref GitHubBranch
                 PollForSourceChanges: false
                 # OutputArtifactFormat: CODEBUILD_CLONE_REF

@@ -12,8 +12,6 @@ phases:
       - echo build docker image and push to ECR
       - ls
       - pwd
-      - cd Ghost
-      - ls
       - docker build -t ghost . 
       - ACCOUNT_ID=`aws sts get-caller-identity --query "Account" --output text`
       - docker tag ghost $ACCOUNT_ID.dkr.ecr.eu-central-1.amazonaws.com/ghost-blog:latest
