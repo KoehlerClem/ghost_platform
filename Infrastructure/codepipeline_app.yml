@@ -9,7 +9,7 @@ Parameters:
     Default: KoehlerClem
   GitHubRepository:
     Type: String
-    Default: ghost
+    Default: Ghost
   GitHubBranch:
     Type: String
     AllowedPattern: '[A-Za-z0-9-]+'
