@@ -1,0 +1,3 @@
+[submodule "Ghost"]
+	path = Ghost
+	url = git@github.com:KoehlerClem/Ghost.git
