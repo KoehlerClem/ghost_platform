@@ -1,11 +1,11 @@
 version: 0.2
 
-env:
-  git-credential-helper: yes
+# env:
+#   git-credential-helper: yes
 phases:
-  pre-build:
-    commands:
-      - git submodule update --init --recursive
+  # pre_build:
+  #   commands:
+  #     - git submodule update --init --recursive
 
   build:
     commands:
