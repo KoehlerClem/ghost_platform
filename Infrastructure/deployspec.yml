@@ -3,8 +3,8 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo Sterted syncing templates to S3
-      - aws s3 sync ./Infrastructure s3://ghost-blog-templates/
+      - echo Start syncing templates to S3
+      - aws s3 sync ./Infrastructure s3://$TemplatesBucket/
       - echo Finished syncing templates to S3
 
 artifacts:

@@ -14,19 +14,20 @@ Resources:
   ECR:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/ecr.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/ecr.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/vpc.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/vpc.yml', TemplatesBucket: !ImportValue TemplatesBucket]
+
 
   ECS:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - VPC
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/ecs.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/ecs.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
   TaskDefinition:
     Type: AWS::CloudFormation::Stack
@@ -35,7 +36,7 @@ Resources:
       - ECS
       - VPC
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/tasks.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/tasks.yml', TemplatesBucket: !ImportValue TemplatesBucket]
       Parameters:
           IsInitialDeploy: !Ref IsInitialDeploy
 
@@ -44,14 +45,14 @@ Resources:
     DependsOn:
       - VPC
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/rds.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/rds.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
   Route53:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - ECS
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/route53.yml
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/route53.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
 # deploy ghost stack
 # aws cloudformation deploy --template-file Infrastructure/ghost_stack.yml --stack-name ghost-blog --capabilities CAPABILITY_IAM

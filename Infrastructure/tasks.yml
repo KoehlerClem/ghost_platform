@@ -9,6 +9,9 @@ Parameters:
       - 'true'
       - 'false'
 
+Conditions:
+  IsInitialDeploy: !Equals [!Ref IsInitialDeploy, 'true']
+
 
 Resources:
   Task:
@@ -23,7 +26,7 @@ Resources:
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: ghost_blog
-          Image: !If [!Equals [!Ref IsInitialDeploy, 'true'], Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
+          Image: !If [IsInitialDeploy , Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
           Environment:
             - Name: url
               Value: http://random-dev-domain.com/
@@ -43,9 +46,10 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'apis'
+              awslogs-create-group: true
+              awslogs-group: 'ghost-blog-task'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'ghost-blog'
+              awslogs-stream-prefix: 'ghost-blog-task'
 
   Service:
     Type: AWS::ECS::Service

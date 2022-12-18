@@ -150,6 +150,9 @@ Resources:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: !Ref CodeBuildEnvironmentImage
+        EnvironmentVariables:
+          - Name: TemplatesBucket
+            Value: !Ref TemplatesBucket
 
   CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'

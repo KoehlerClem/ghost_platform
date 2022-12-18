@@ -6,8 +6,10 @@ Description: S3 bucket for storing cloudformation templates
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: ghost-blog-templates
 
-# deploy s3 bucket ghost-blog-templates
-# aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-s3
+Outputs:
+  BucketName:
+    Value: !Ref S3Bucket
+    Description: Name of the Ghost Templates S3 bucket
+    Export:
+      Name: TemplatesBucket

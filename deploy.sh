@@ -6,8 +6,9 @@ aws_profile=${1:?Please provide branch and aws profile. Example: ./deploy.sh def
 git_branch=${2:?Please provide branch and aws profile. Example: ./deploy.sh default main}
 
 # push cloudformation templates to S3
-aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-s3 --profile $aws_profile
-aws s3 --profile $aws_profile sync ./Infrastructure s3://ghost-blog-templates
+aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-template-s3 --profile $aws_profile
+template_bucket=`aws cloudformation --profile $aws_profile describe-stacks --stack-name ghost-blog-template-s3 --query 'Stacks[?StackName=='ghost-blog-template-s3'][].Outputs[?OutputKey==`TemplatesBucket`].OutputValue' --output text`
+aws s3 --profile $aws_profile sync ./Infrastructure s3://$template_bucket
 
 # deploy infastructure and ci/cd pipelines
 aws cloudformation deploy --template-file Infrastructure/ghost_infra.yml --stack-name ghost-blog --capabilities CAPABILITY_IAM --parameter-overrides ParameterKey=IsInitialDeploy,ParameterValue=true --profile $aws_profile
