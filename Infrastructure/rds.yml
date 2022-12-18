@@ -94,4 +94,4 @@ Outputs:
 
 
 # deploy the stack
-# aws cloudformation deploy --template-file Infrastructure/rds.yml --stack-name rds --capabilities CAPABILITY_NAMED_IAM
+# aws cloudformation deploy --template-file Infrastructure/rds.yml --stack-name rds --capabilities CAPABILITY_IAM

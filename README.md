@@ -3,6 +3,7 @@
 
 ## Infrastructure Setup
 
+https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-update.html
 1. create GitHub token (which permissions?)
 2. run create_env.sh which:
     1. creates an aws account for the production env
