@@ -13,7 +13,6 @@ Parameters:
   GitHubBranch:
     Type: String
     AllowedPattern: '[A-Za-z0-9-]+'
-    Default: main
   CodeBuildEnvironmentImage:
     Type: String
     Default: 'aws/codebuild/standard:4.0'

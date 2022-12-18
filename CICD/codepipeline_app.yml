@@ -13,9 +13,8 @@ Parameters:
   GitHubBranch:
     Type: String
     AllowedPattern: '[A-Za-z0-9-]+'
-    Default: main
-Resources:
-  
+
+Resources:  
   CodePipelineArtifactStore:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -105,7 +104,7 @@ Resources:
               {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
       Cache:
         Type: LOCAL
-        Modes: # You can specify one or more cache mode, 
+        Modes:
           - LOCAL_DOCKER_LAYER_CACHE
 
   CodeBuildServiceRole:
