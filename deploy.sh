@@ -6,7 +6,6 @@ aws_profile=${1:?Please provide branch and aws profile. Example: ./deploy.sh def
 git_branch=${2:?Please provide branch and aws profile. Example: ./deploy.sh default main}
 
 # push cloudformation templates to S3
-cd ..
 aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-s3 --profile $aws_profile
 aws s3 --profile $aws_profile sync ./Infrastructure s3://ghost-blog-templates
 
