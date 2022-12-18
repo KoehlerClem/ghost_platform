@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: container on ecs cluster
 
+Parameters:
+  IsInitialDeploy:
+    Type: Boolean
+    Default: false
+
 Resources:
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -14,7 +19,7 @@ Resources:
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: ghost_blog
-          Image: !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]
+          Image: !If [!Ref IsInitialDeploy, Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
           Environment:
             - Name: url
               Value: http://random-dev-domain.com/

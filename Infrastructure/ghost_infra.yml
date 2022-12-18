@@ -2,7 +2,17 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
+Parameters:
+  IsInitialDeploy:
+    Type: Boolean
+    Default: false
+
 Resources:
+  ECR:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/ecr.yml
+
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -23,6 +33,8 @@ Resources:
       - VPC
     Properties:
       TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/tasks.yml
+    Parameters:
+        IsInitialDeploy: !Ref IsInitialDeploy
 
   RDS:
     Type: AWS::CloudFormation::Stack
