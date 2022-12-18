@@ -80,7 +80,7 @@ Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
-      Name: !Ref 'AWS::StackName'
+      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
       RoleArn: !GetAtt [PipelineRole, Arn]
       ArtifactStore:
         Type: S3
@@ -139,7 +139,7 @@ Resources:
   SyncTemplatesS3:  
     Type: 'AWS::CodeBuild::Project'
     Properties:
-      Name: !Sub '${AWS::StackName}-deploy-dev'
+      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
       ServiceRole: !Ref CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
