@@ -16,6 +16,7 @@ Parameters:
 Resources:
   DBInstance:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
     DependsOn: 
       - SecretsManagerRDS
       - DBSubnetGroup

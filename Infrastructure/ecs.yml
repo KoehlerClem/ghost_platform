@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: container cluster on ECS, loadbalancer, security groups and cloudwatch
 
 Resources:
-  
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

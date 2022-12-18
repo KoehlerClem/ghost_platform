@@ -1,13 +1,17 @@
-Type: AWS::CloudFront::Distribution
-Properties: 
-  DistributionConfig: 
-    DefaultCacheBehavior:
-      TargetOriginId: !ImportValue ELBDomainName
-      ViewerProtocolPolicy: allow-all
+AWSTemplateFormatVersion: '2010-09-09'
 
-      ForwardedValues:
-        QueryString: true
-        Cookies:
+Resources:
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties: 
+      DistributionConfig: 
+        DefaultCacheBehavior:
+          TargetOriginId: !ImportValue ELBDomainName
+          ViewerProtocolPolicy: allow-all
+
+          ForwardedValues:
+            QueryString: true
+            Cookies:
           Forward: all
 
 Outputs:
