@@ -7,7 +7,7 @@ git_branch=${2:?Please provide branch and aws profile. Example: ./deploy.sh defa
 
 # push cloudformation templates to S3
 aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-template-s3 --profile $aws_profile
-template_bucket=`aws cloudformation --profile $aws_profile describe-stacks --stack-name ghost-blog-template-s3 --query 'Stacks[?StackName=='ghost-blog-template-s3'][].Outputs[?OutputKey==`TemplatesBucket`].OutputValue' --output text`
+template_bucket=`aws cloudformation --profile $aws_profile describe-stacks --stack-name ghost-blog-template-s3 --query "Stacks[?StackName=='ghost-blog-template-s3'][].Outputs[].OutputValue" --output text`
 aws s3 --profile $aws_profile sync ./Infrastructure s3://$template_bucket
 
 # deploy infastructure and ci/cd pipelines
