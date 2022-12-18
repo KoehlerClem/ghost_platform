@@ -3,8 +3,12 @@ Description: container on ecs cluster
 
 Parameters:
   IsInitialDeploy:
-    Type: Boolean
-    Default: false
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+
 
 Resources:
   Task:
@@ -19,7 +23,7 @@ Resources:
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: ghost_blog
-          Image: !If [!Ref IsInitialDeploy, Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
+          Image: !If [!Equals [!Ref IsInitialDeploy, 'true'], Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
           Environment:
             - Name: url
               Value: http://random-dev-domain.com/

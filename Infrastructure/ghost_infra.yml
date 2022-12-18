@@ -4,8 +4,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
   IsInitialDeploy:
-    Type: Boolean
-    Default: false
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
 
 Resources:
   ECR:
