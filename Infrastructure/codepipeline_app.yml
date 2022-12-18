@@ -22,25 +22,6 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
   
-  CodePipelineWebhook:
-    Type: 'AWS::CodePipeline::Webhook'
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: >-
-          {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
-      RegisterWithThirdParty: 'true'
-      Filters:
-        - JsonPath: $.ref
-          MatchEquals: 'refs/heads/{Branch}'
-        - JsonPath: $.repository.name
-          MatchEquals: '{Repo}'
-      TargetPipeline: !Ref CodePipeline
-      TargetAction: Source
-      TargetPipelineVersion: !GetAtt 
-        - CodePipeline
-        - Version
-  
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
@@ -50,22 +31,21 @@ Resources:
         Type: S3
         Location: !Ref CodePipelineArtifactStore
       Stages:
-        - Name: GitHubSource
+        - Name: Source
           Actions:
-            - Name: Source
+            - InputArtifacts: []
+              Name: Source
               ActionTypeId:
+                Version: '1'
+                Owner: AWS
                 Category: Source
-                Owner: ThirdParty
-                Version: 1
-                Provider: GitHub
+                Provider: CodeStarSourceConnection
+              RunOrder: 1
               Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: Ghost
-                Branch: !Ref GitHubBranch
-                PollForSourceChanges: false
-                # OutputArtifactFormat: CODEBUILD_CLONE_REF
-                OAuthToken: >-
-                  {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
+                ConnectionArn: !ImportValue GhostGithubConnection
+                FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepository}'
+                BranchName: "main"
+                OutputArtifactFormat: "CODEBUILD_CLONE_REF"
               OutputArtifacts:
                 - Name: SourceCode
         - Name: BuildAndDeployGhostImage
@@ -96,6 +76,10 @@ Resources:
         ComputeType: BUILD_GENERAL1_MEDIUM
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
         PrivilegedMode: true
+      Cache:
+        Type: LOCAL
+        Modes: # You can specify one or more cache mode, 
+          - LOCAL_DOCKER_LAYER_CACHE
 
   CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'
@@ -116,8 +100,13 @@ Resources:
                 Action:
                   - 'logs:*'
                   - 's3:*'
+                  - 'codestar-connections:UseConnection'
                 Resource:
                   - '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AdministratorAccess
 
   PipelineRole:
     Type: AWS::IAM::Role

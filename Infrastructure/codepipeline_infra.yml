@@ -40,9 +40,7 @@ Resources:
           MatchEquals: '{Repo}'
       TargetPipeline: !Ref CodePipeline
       TargetAction: Source
-      TargetPipelineVersion: !GetAtt 
-        - CodePipeline
-        - Version
+      TargetPipelineVersion: !GetAtt [CodePipeline, Version]
   
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
