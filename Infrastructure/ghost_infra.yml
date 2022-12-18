@@ -36,8 +36,8 @@ Resources:
       - VPC
     Properties:
       TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/tasks.yml
-    Parameters:
-        IsInitialDeploy: !Ref IsInitialDeploy
+      Parameters:
+          IsInitialDeploy: !Ref IsInitialDeploy
 
   RDS:
     Type: AWS::CloudFormation::Stack
