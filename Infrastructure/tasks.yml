@@ -1,18 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: container on ecs cluster
 
-Parameters:
-  IsInitialDeploy:
-    Type: String
-    Default: 'false'
-    AllowedValues:
-      - 'true'
-      - 'false'
-
-Conditions:
-  IsInitialDeploy: !Equals [!Ref IsInitialDeploy, 'true']
-
-
 Resources:
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -26,7 +14,7 @@ Resources:
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: ghost_blog
-          Image: !If [IsInitialDeploy , Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
+          Image: !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]
           Environment:
             - Name: url
               Value: http://random-dev-domain.com/
@@ -98,6 +86,7 @@ Resources:
                 # ECS tasks to upload logs to CloudWatch
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
+                - 'logs:CreateLogGroup'
               Resource: '*'
 
 
