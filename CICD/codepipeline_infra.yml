@@ -152,7 +152,7 @@ Resources:
         Image: !Ref CodeBuildEnvironmentImage
         EnvironmentVariables:
           - Name: TemplatesBucket
-            Value: !Ref TemplatesBucket
+            Value: !ImportValue TemplatesBucket
 
   CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'
