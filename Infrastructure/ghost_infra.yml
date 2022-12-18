@@ -31,6 +31,13 @@ Resources:
     Properties:
       TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/codepipeline_app.yml
 
+  CodePipelineInfra:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - TaskDefinition
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ghost-blog-templates/codepipeline_infra.yml
+
   RDS:
     Type: AWS::CloudFormation::Stack
     DependsOn:

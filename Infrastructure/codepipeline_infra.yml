@@ -120,7 +120,7 @@ Resources:
                 Version: '1'
               Configuration:
                 ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_NAMED_IAM
+                Capabilities: CAPABILITY_IAM
                 ChangeSetName: ghost-blog-changeset
                 RoleArn: !GetAtt [CloudformationRole, Arn]
                 StackName: ghost-infra
