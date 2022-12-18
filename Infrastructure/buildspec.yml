@@ -3,9 +3,6 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo Entered the build phase...
-      - echo Build started on `date`
-
-artifacts:
-   files:
-     - '**/*'
+      - echo Creating change set
+      - aws cloudformation create-change-set --stack-name ghost-blog --template-body file://Infrastructure/ghost_blog.yml --capabilities CAPABILITY_IAM
+      - echo Finished creating change set
