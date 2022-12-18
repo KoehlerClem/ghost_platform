@@ -1,5 +1,5 @@
 set -e
-git_branch=${1:?Please provide git branch name which will be deployed to AWS on this account}
+git_branch=${1:?Please provide the git branch name which will be deployed to AWS, one branch per Account}
 aws cloudformation deploy --template-file Infrastructure/ecr.yml --stack-name ghost-blog-ecr
 
 # build docker image and push to ECR
