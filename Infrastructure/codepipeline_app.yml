@@ -21,6 +21,23 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
+
+  CodePipelineWebhook:
+    Type: 'AWS::CodePipeline::Webhook'
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: >-
+          {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
+      RegisterWithThirdParty: 'true'
+      Filters:
+        - JsonPath: $.ref
+          MatchEquals: 'refs/heads/{Branch}'
+        - JsonPath: $.repository.name
+          MatchEquals: '{Repo}'
+      TargetPipeline: !Ref CodePipeline
+      TargetAction: Source
+      TargetPipelineVersion: !GetAtt [CodePipeline, Version]
   
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
@@ -31,21 +48,21 @@ Resources:
         Type: S3
         Location: !Ref CodePipelineArtifactStore
       Stages:
-        - Name: Source
+        - Name: GitHubSource
           Actions:
-            - InputArtifacts: []
-              Name: Source
+            - Name: Source
               ActionTypeId:
-                Version: '1'
-                Owner: AWS
                 Category: Source
-                Provider: CodeStarSourceConnection
-              RunOrder: 1
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
               Configuration:
-                ConnectionArn: !ImportValue GhostGithubConnection
-                FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepository}'
-                BranchName: "main"
-                OutputArtifactFormat: "CODEBUILD_CLONE_REF"
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepository
+                Branch: !Ref GitHubBranch
+                PollForSourceChanges: false
+                OAuthToken: >-
+                  {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
               OutputArtifacts:
                 - Name: SourceCode
         - Name: BuildAndDeployGhostImage
@@ -76,6 +93,16 @@ Resources:
         ComputeType: BUILD_GENERAL1_MEDIUM
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
         PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: GitHubOwner
+            Value: !Ref GitHubOwner
+          - Name: GitHubRepository
+            Value: !Ref GitHubRepository
+          - Name: GitHubBranch
+            Value: !Ref GitHubBranch
+          - Name: Token
+            Value: >-
+              {{resolve:secretsmanager:GITHUB_ACCESS:SecretString:GITHUB_ACCESS_TOKEN}}
       Cache:
         Type: LOCAL
         Modes: # You can specify one or more cache mode, 
