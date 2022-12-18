@@ -3,11 +3,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Resources:
-  ECR:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/ecr.yml', TemplatesBucket: !ImportValue TemplatesBucket]
-
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -34,7 +29,6 @@ Resources:
       - RDS
       - ECS
       - VPC
-      - ECR
     Properties:
       TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/tasks.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
