@@ -131,7 +131,7 @@ Resources:
                 Capabilities: CAPABILITY_IAM
                 ChangeSetName: ghost-blog-changeset
                 RoleArn: !GetAtt [CloudformationRole, Arn]
-                StackName: ghost-infra
+                StackName: ghost-blog
                 TemplatePath: SourceCode::Infrastructure/ghost_infra.yml
               InputArtifacts:
                 - Name: SourceCode
