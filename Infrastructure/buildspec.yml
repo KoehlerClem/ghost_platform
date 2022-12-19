@@ -4,6 +4,6 @@ phases:
   build:
     commands:
       - echo Creating change set
-      - aws cloudformation validate-template --template-body file://Infrastructure/ghost_infra.yml
-      - aws cloudformation create-change-set --stack-name ghost-blog --change-set-name ghost-blog-changeset --template-body file://Infrastructure/ghost_infra.yml --capabilities CAPABILITY_IAM
+      - aws cloudformation validate-template --template-body file://Infrastructure/ghost-blog.yml
+      - aws cloudformation create-change-set --stack-name ghost-blog --change-set-name ghost-blog-changeset --template-body file://Infrastructure/ghost-blog.yml --capabilities CAPABILITY_IAM
       - echo Finished creating change set

@@ -9,4 +9,4 @@ phases:
 
 artifacts:
   files:
-    - 'Infrastructure/ghost_infra.yml'
+    - 'Infrastructure/ghost-blog.yml'

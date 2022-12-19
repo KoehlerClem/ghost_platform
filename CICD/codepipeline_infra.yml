@@ -131,7 +131,7 @@ Resources:
                 ChangeSetName: ghost-blog-changeset
                 RoleArn: !GetAtt [CloudformationRole, Arn]
                 StackName: ghost-blog
-                TemplatePath: SourceCode::Infrastructure/ghost_infra.yml
+                TemplatePath: SourceCode::Infrastructure/ghost-blog.yml
               InputArtifacts:
                 - Name: SourceCode
 
