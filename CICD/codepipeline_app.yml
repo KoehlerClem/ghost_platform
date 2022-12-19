@@ -46,7 +46,7 @@ Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
-      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
+      Name: !Sub 'CodePipeline-GhostApp-${GitHubBranch}'
       RoleArn: !GetAtt [PipelineRole, Arn]
       ArtifactStore:
         Type: S3
@@ -85,7 +85,7 @@ Resources:
   BuildAndDeployGhostImage:  
     Type: 'AWS::CodeBuild::Project'
     Properties:
-      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
+      Name: !Sub 'BuildAndDeployGhostImage-${GitHubBranch}'
       ServiceRole: !Ref CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE

@@ -5,13 +5,21 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties: 
       DistributionConfig: 
+        Origins:
+          - DomainName: !ImportValue ELBDomainName
+            Id: !ImportValue ELBDomainName
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
         DefaultCacheBehavior:
           TargetOriginId: !ImportValue ELBDomainName
           ViewerProtocolPolicy: allow-all
-        Enabled: true
+        Enabled: 'true'
 
 Outputs:
   DistributionDomainName:
     Value: !GetAtt Distribution.DomainName
     Export:
       Name: DistributionDomainName
+
+# deploy cloudfront stack
+# aws cloudformation deploy --template-file Infrastructure/cloudfront.yml --stack-name ghost-blog-cloudfront --capabilities CAPABILITY_IAM
