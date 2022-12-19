@@ -8,6 +8,7 @@ Resources:
         DefaultCacheBehavior:
           TargetOriginId: !ImportValue ELBDomainName
           ViewerProtocolPolicy: allow-all
+        Enabled: true
 
 Outputs:
   DistributionDomainName:
