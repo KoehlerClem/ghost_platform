@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties: 
+      DistributionConfig: 
+        Origins:
+          - DomainName: !ImportValue ELBDomainName
+            Id: !ImportValue ELBDomainName
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+        Enabled: 'true'
+        DefaultCacheBehavior:
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          TargetOriginId: !ImportValue ELBDomainName
+          ViewerProtocolPolicy: allow-all
+
+Outputs:
+  DistributionDomainName:
+    Value: !GetAtt Distribution.DomainName
+    Export:
+      Name: DistributionDomainName
+
+# deploy cloudfront stack
+# aws cloudformation deploy --template-file Infrastructure/cloudfront.yml --stack-name ghost-blog-cloudfront --capabilities CAPABILITY_IAM

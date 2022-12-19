@@ -16,7 +16,10 @@ Parameters:
 Resources:
   DBInstance:
     Type: AWS::RDS::DBInstance
-    DependsOn: SecretsManagerRDS
+    DeletionPolicy: Delete
+    DependsOn: 
+      - SecretsManagerRDS
+      - DBSubnetGroup
     Properties:
       DBName: !Ref DBName
       DBInstanceClass: db.t4g.micro

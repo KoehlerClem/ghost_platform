@@ -1,15 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: container on ecs cluster
 
-Parameters:
-  IsInitialDeploy:
-    Type: String
-    Default: 'false'
-    AllowedValues:
-      - 'true'
-      - 'false'
-
-
 Resources:
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -23,10 +14,10 @@ Resources:
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: ghost_blog
-          Image: !If [!Equals [!Ref IsInitialDeploy, 'true'], Ghost, !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]]
+          Image: !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]
           Environment:
             - Name: url
-              Value: http://random-dev-domain.com/
+              Value: !Sub ['http://${DistributionDomainName}', DistributionDomainName: !ImportValue DistributionDomainName]
             - Name: database__connection__host
               Value: !ImportValue DBAddress
             - Name: database__connection__user
@@ -43,9 +34,10 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'apis'
+              awslogs-create-group: true
+              awslogs-group: 'ghost-blog-task'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'ghost-blog'
+              awslogs-stream-prefix: 'ghost-blog-task'
 
   Service:
     Type: AWS::ECS::Service
@@ -94,6 +86,7 @@ Resources:
                 # ECS tasks to upload logs to CloudWatch
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
+                - 'logs:CreateLogGroup'
               Resource: '*'
 
 

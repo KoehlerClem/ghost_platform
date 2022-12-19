@@ -15,6 +15,11 @@ Parameters:
     AllowedPattern: '[A-Za-z0-9-]+'
 
 Resources:  
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ghost-blog
+
   CodePipelineArtifactStore:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -41,7 +46,7 @@ Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
-      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
+      Name: !Sub 'CodePipeline-GhostApp-${GitHubBranch}'
       RoleArn: !GetAtt [PipelineRole, Arn]
       ArtifactStore:
         Type: S3
@@ -80,7 +85,7 @@ Resources:
   BuildAndDeployGhostImage:  
     Type: 'AWS::CodeBuild::Project'
     Properties:
-      Name: !Sub '${AWS::StackName}-${GitHubBranch}'
+      Name: !Sub 'BuildAndDeployGhostImage-${GitHubBranch}'
       ServiceRole: !Ref CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
@@ -148,6 +153,12 @@ Resources:
         - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
         - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  ECRRepository:
+    Value: !GetAtt ECRRepository.RepositoryUri
+    Export:
+      Name: 'ECRRepositoryRepositoryUri'
 
 # deply codepipeline
 # aws cloudformation deploy --template-file CICD/codepipeline_app.yml --stack-name codepipeline-app --capabilities CAPABILITY_IAM
