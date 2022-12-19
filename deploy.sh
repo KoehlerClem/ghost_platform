@@ -1,11 +1,11 @@
 set -e
+aws_profile=${1:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
+git_branch=${2:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
 GITHUB_ACCESS_TOKEN=${3:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
-aws create-secret --profile --name GITHUB_ACCESS --secret-string $GITHUB_ACCESS_TOKEN --force-overwrite-replica-secret
+aws secretsmanager create-secret --profile $aws_profile --name GITHUB_ACCESS --secret-string "{\"GITHUB_ACCESS_TOKEN\": \"$GITHUB_ACCESS_TOKEN\"} --force-overwrite-replica-secret
 PS4='Line ${LINENO}: '
 set -x
 
-aws_profile=${1:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
-git_branch=${2:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
 
 # push cloudformation templates to S3
 aws cloudformation deploy --template-file Infrastructure/s3.yml --stack-name ghost-blog-template-s3 --profile $aws_profile
