@@ -2,7 +2,7 @@ set -e
 aws_profile=${1:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
 git_branch=${2:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
 GITHUB_ACCESS_TOKEN=${3:?Please provide branch, aws profile and GitHub Token. Example: ./deploy.sh default main GITHUB_ACCESS_TOKEN}
-aws secretsmanager create-secret --profile $aws_profile --name GITHUB_ACCESS --secret-string "{\"GITHUB_ACCESS_TOKEN\": \"$GITHUB_ACCESS_TOKEN\"} --force-overwrite-replica-secret
+aws secretsmanager update-secret --profile $aws_profile --secret-id GITHUB_ACCESS --secret-string "{\"GITHUB_ACCESS_TOKEN\": \"$GITHUB_ACCESS_TOKEN\"}"
 PS4='Line ${LINENO}: '
 set -x
 

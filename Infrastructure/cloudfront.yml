@@ -9,11 +9,6 @@ Resources:
           TargetOriginId: !ImportValue ELBDomainName
           ViewerProtocolPolicy: allow-all
 
-          ForwardedValues:
-            QueryString: true
-            Cookies:
-          Forward: all
-
 Outputs:
   DistributionDomainName:
     Value: !GetAtt Distribution.DomainName
