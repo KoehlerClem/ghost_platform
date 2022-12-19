@@ -9,11 +9,12 @@ Resources:
           - DomainName: !ImportValue ELBDomainName
             Id: !ImportValue ELBDomainName
             CustomOriginConfig:
-              OriginProtocolPolicy: allow-all
+              OriginProtocolPolicy: http-only
+        Enabled: 'true'
         DefaultCacheBehavior:
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           TargetOriginId: !ImportValue ELBDomainName
           ViewerProtocolPolicy: allow-all
-        Enabled: 'true'
 
 Outputs:
   DistributionDomainName:
