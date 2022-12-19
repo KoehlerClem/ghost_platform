@@ -34,7 +34,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Sub 'https://github.com/${GitHubOwner}/${GitHubRepository}.git'
-        BuildSpec: buildspec.yaml
+        BuildSpec: Infrastructure/buildspec.yaml
         Auth:
           Type: OAUTH
           Resource: !Ref CodeBuildSourceCredential
@@ -80,7 +80,7 @@ Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
-      Name: !Sub CodePipeline-AWS-Infra-${GitHubBranch}'
+      Name: !Sub 'CodePipeline-AWS-Infra-${GitHubBranch}'
       RoleArn: !GetAtt [PipelineRole, Arn]
       ArtifactStore:
         Type: S3

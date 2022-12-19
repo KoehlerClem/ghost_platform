@@ -9,7 +9,7 @@ Resources:
           - DomainName: !ImportValue ELBDomainName
             Id: !ImportValue ELBDomainName
             CustomOriginConfig:
-              OriginProtocolPolicy: http-only
+              OriginProtocolPolicy: allow-all
         DefaultCacheBehavior:
           TargetOriginId: !ImportValue ELBDomainName
           ViewerProtocolPolicy: allow-all
