@@ -15,13 +15,13 @@ Resources:
     Properties:
       TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/ecs.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
-  CloudFront:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - VPC
-      - ECS
-    Properties:
-      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/cloudfront.yml', TemplatesBucket: !ImportValue TemplatesBucket]
+  # CloudFront:
+  #   Type: AWS::CloudFormation::Stack
+  #   DependsOn:
+  #     - VPC
+  #     - ECS
+  #   Properties:
+  #     TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/cloudfront.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
   TaskDefinition:
     Type: AWS::CloudFormation::Stack
