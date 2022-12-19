@@ -1,4 +1,4 @@
-# ghost_platformm
+# ghost_platform
 
 
 ## Infrastructure Setup
