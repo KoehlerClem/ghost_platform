@@ -34,7 +34,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Sub 'https://github.com/${GitHubOwner}/${GitHubRepository}.git'
-        BuildSpec: Infrastructure/buildspec.yaml
+        BuildSpec: Infrastructure/buildspec.yml
         Auth:
           Type: OAUTH
           Resource: !Ref CodeBuildSourceCredential
