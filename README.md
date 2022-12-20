@@ -28,13 +28,12 @@ To get this project up and running on your own machine, follow these steps:
 6. In the AWS console go to the CloudFormation stack and look for the CloudFront output link. 
 7. Gost is now deployed and ready to use under the CloudFront URL!
 
-## Updating the Ghost App
 
-To update the Ghost app, simply push your changes to the Ghost GitHub repository. The Codepipeline will automatically detect the changes and deploy the new version of the Ghost app.
+## Updating the Code 
 
-## Updating the AWS Infrastructure
+To update the AWS infrastructure or Ghost App, push your changes to the ghost_platform GitHub repository. The Codepipeline will automatically detect the changes and deploy the new version of the AWS infrastructure. On Pull request a CodeBuild will be run to test the changes. Branch protection is enabled for the main branch.
 
-To update the AWS infrastructure, simply push your changes to the ghost_platform GitHub repository. The Codepipeline will automatically detect the changes and deploy the new version of the AWS infrastructure.
+See Pull Request #1 for an example of a pull request: https://github.com/KoehlerClem/ghost_platform/pull/3
 
 ### Use Delete Posts Lambda
 
