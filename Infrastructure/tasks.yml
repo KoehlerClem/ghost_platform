@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: container on ecs cluster
+
+Resources:
+  GhostContentBucket:
+    Type: AWS::S3::Bucket
+
+  S3GhostBucketUser:
+    Type: AWS::IAM::User
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  S3UserCreds:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref S3GhostBucketUser
+
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ghost-blog-task
+      Cpu: 1024
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name: ghost_blog
+          Image: !Join ['', [!ImportValue ECRRepositoryRepositoryUri, ':latest']]
+          Environment:
+            - Name: url
+              Value: !Join ['', ['http://', !ImportValue DistributionDomainName]]
+            - Name: database__connection__host
+              Value: !ImportValue DBAddress
+            - Name: database__connection__user
+              Value: !Sub ['{{resolve:secretsmanager:${SecretsManagerRDS}::username}}', SecretsManagerRDS: !ImportValue SecretsManagerRDS]
+            - Name: database__connection__password
+              Value: !Sub ['{{resolve:secretsmanager:${SecretsManagerRDS}::password}}', SecretsManagerRDS: !ImportValue SecretsManagerRDS]
+            - Name: database__connection__database
+              Value: !ImportValue DBName
+            - Name: storage__active
+              Value: s3
+            - Name: storage__s3__bucket
+              Value: !Ref GhostContentBucket
+            - Name: storage__s3__region
+              Value: !Ref AWS::Region
+            - Name: storage__s3__accessKeyId
+              Value: !Ref S3UserCreds
+            - Name: storage__s3__secretAccessKey
+              Value: !GetAtt S3UserCreds.SecretAccessKey
+          Cpu: 1024
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: 2368
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-create-group: true
+              awslogs-group: 'ghost-blog-task'
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'ghost-blog-task'
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: ghost-blog-service
+      TaskDefinition: !Ref Task
+      Cluster: !ImportValue 'ECSCluster'
+      LaunchType: FARGATE
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !ImportValue GhostPublicSubnet1
+            - !ImportValue GhostPublicSubnet2
+          SecurityGroups:
+            - !ImportValue ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: ghost_blog
+          ContainerPort: 2368
+          TargetGroupArn: !ImportValue GhostBlogTargetGroup
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+          Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+  
+Outputs:
+  ApiEndpoint:
+    Description: Ghost Blog API Endpoint
+    Value: !Join ['', ['http://', !ImportValue DistributionDomainName]]
+    Export:
+      Name: 'GhostBlog'
+
+# deploy the stack
+# aws cloudformation deploy --template-file Infrastructure/tasks.yml --stack-name ghost-blog-task --capabilities CAPABILITY_IAM

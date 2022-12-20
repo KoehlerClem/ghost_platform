@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties: 
+      DistributionConfig: 
+        Origins:
+          - DomainName: !ImportValue ELBDomainName
+            Id: GhostELB
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+            # OriginCustomHeaders:
+            #   - HeaderName: 'X-Forwarded-Host'
+            #     HeaderValue: random-dev-domain.com
+            #   - HeaderName: 'X-Forwarded-Proto'
+            #     HeaderValue: 'http'
+        Enabled: 'true'
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          TargetOriginId: GhostELB
+          ViewerProtocolPolicy: allow-all
+          ForwardedValues:
+            QueryString: 'true'
+            Headers:
+              - 'Origin'
+              - 'Referer'
+              - 'User-Agent'
+            Cookies:
+              Forward: all
+
+Outputs:
+  DistributionDomainName:
+    Value: !GetAtt Distribution.DomainName
+    Export:
+      Name: DistributionDomainName
+
+# deploy cloudfront stack
+# aws cloudformation deploy --template-file Infrastructure/cloudfront.yml --stack-name ghost-blog-cloudfront --capabilities CAPABILITY_IAM

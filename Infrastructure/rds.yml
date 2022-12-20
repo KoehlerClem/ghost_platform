@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Creates a MySQL DB in RDS
+
+Parameters:
+  DBName:
+    Type: String
+    Default: ghost_blog
+    Description: Name of the database
+  
+  ReplicaRegion:
+    Type: String
+    Default: eu-west-2
+    Description: Region to replicate the secret to
+
+Resources:
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    DependsOn: 
+      - SecretsManagerRDS
+      - DBSubnetGroup
+    Properties:
+      DBName: !Ref DBName
+      DBInstanceClass: db.t4g.micro
+      Engine: mysql
+      MasterUsername: !Sub '{{resolve:secretsmanager:${SecretsManagerRDS}::username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${SecretsManagerRDS}::password}}'
+      AllocatedStorage: 20
+      MultiAZ: false
+      VPCSecurityGroups:
+        - !Ref SecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for DB
+      SubnetIds:
+        - !ImportValue GhostPrivateSubnet1
+        - !ImportValue GhostPrivateSubnet2
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow MySQL access
+      VpcId: !ImportValue VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 10.0.0.0/16
+
+  SecretsManagerRDS:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Description: AWS RDS admin credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludeCharacters: '"@/\'
+      ReplicaRegions:
+      - Region: !Ref ReplicaRegion
+
+  SecretRDSInstanceAttachment:
+    Type: 'AWS::SecretsManager::SecretTargetAttachment'
+    Properties:
+      SecretId: !Ref SecretsManagerRDS
+      TargetId: !Ref DBInstance
+      TargetType: 'AWS::RDS::DBInstance'
+
+
+Outputs:
+  DBAddress:
+    Description: The database address
+    Value: !GetAtt DBInstance.Endpoint.Address
+    Export:
+      Name: DBAddress
+  DBPort:
+    Description: The database port
+    Value: !GetAtt DBInstance.Endpoint.Port
+    Export:
+      Name: DBPort
+  DBName:
+    Description: The database name
+    Value: !Ref DBName
+    Export:
+      Name: DBName
+  SecretsManagerRDS:
+    Description: The secret name
+    Value: !Ref SecretsManagerRDS
+    Export:
+      Name: SecretsManagerRDS
+
+  
+
+
+# deploy the stack
+# aws cloudformation deploy --template-file Infrastructure/rds.yml --stack-name rds --capabilities CAPABILITY_IAM

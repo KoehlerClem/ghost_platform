@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Start syncing templates to S3
+      - aws s3 sync ./Infrastructure s3://$TemplatesBucket/
+      - echo Finished syncing templates to S3
+      - echo Start deploying Lambda
+      - aws s3 cp ./Lambdas/deletePosts/function.zip s3://$TemplatesBucket/function.zip
+
+artifacts:
+  files:
+    - 'Infrastructure/ghost-blog.yml'
