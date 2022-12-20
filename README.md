@@ -1,4 +1,4 @@
-# Ghost in the Cloud ☁️
+# Ghost in the Cloud ☁️ 
 
 Welcome to the Ghost in the Cloud project, a project to host the Ghost platform in the cloud. Below you find instructions for installation and a summary of the project's architecture as well as slides. 
 
