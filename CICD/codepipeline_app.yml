@@ -123,7 +123,7 @@ Resources:
               Service: codebuild.amazonaws.com
             Action: 'sts:AssumeRole'
       Policies:
-        - PolicyName: root
+        - PolicyName: DeployGhostImage
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -131,11 +131,10 @@ Resources:
                 Action:
                   - 'logs:*'
                   - 's3:*'
-                  - 'codestar-connections:UseConnection'
+                  - 'ecr:*'
+                  - 'ecs:*'
                 Resource:
                   - '*'
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
 
   PipelineRole:
     Type: AWS::IAM::Role
@@ -147,10 +146,17 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: S3andLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 'logs:*'
+                - 's3:*'
+                - 'codebuild:*'
+                Effect: Allow
+                Resource: '*'
 
 Outputs:
   ECRRepository:

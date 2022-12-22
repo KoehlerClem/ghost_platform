@@ -166,8 +166,16 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
             Action: 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: GetGithubSource
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 'logs:*'
+                - 's3:*'
+                Effect: Allow
+                Resource: '*'
 
   PipelineRole:
     Type: AWS::IAM::Role
@@ -179,8 +187,19 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: S3andLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 'logs:*'
+                - 's3:*'
+                - 'codebuild:*'
+                - 'cloudformation:*'
+                - 'iam:PassRole'
+                Effect: Allow
+                Resource: '*'
   
   CloudformationRole:
     Type: AWS::IAM::Role

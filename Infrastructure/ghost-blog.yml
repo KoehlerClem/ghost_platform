@@ -47,10 +47,10 @@ Resources:
     Properties:
       TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/lambda.yml', TemplatesBucket: !ImportValue TemplatesBucket]
 
-  # CloudTrail:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/cloudtrail.yml', TemplatesBucket: !ImportValue TemplatesBucket]
+  CloudTrail:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ['https://s3.amazonaws.com/${TemplatesBucket}/cloudtrail.yml', TemplatesBucket: !ImportValue TemplatesBucket]
     
   # Route53:
   #   Type: AWS::CloudFormation::Stack

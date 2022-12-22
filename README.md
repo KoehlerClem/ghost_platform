@@ -1,16 +1,30 @@
-# Ghost in the Cloud ☁️
+# ☁️ Ghost in the Cloud
 
-Welcome to the Ghost in the Cloud project, a project to host the Ghost platform in the cloud. Below you find instructions for installation and a summary of the project's architecture as well as slides. 
+Welcome to the Ghost in the Cloud project, a project that hosts the Ghost platform in the cloud. The following instructions will guide you through the process of installation and provide an overview of the project's architecture.
 
-## 💻 Installation
-To get this project up and running on your own machine, follow these steps:
+# Table of Contents
 
-1. Fork https://github.com/KoehlerClem/ghost_platform and https://github.com/KoehlerClem/Ghost
-2. Initialize the submodules in Ghost:
+- [💻 Installation](#-installation)
+- [🔄 Updating the Code](#-updating-the-code)
+- [🛠️ Update the Codepipeline](#️-update-the-codepipeline)
+- [🗑️ Use Delete Posts Lambda](#️-use-delete-posts-lambda)
+- [🏗️ Architecture Summary](#️-architecture-summary)
+- [📚 Architecture Slides](#-architecture-slides)
+
+# 💻 Installation
+
+To set up this project on your own machine and AWS account, follow these steps:
+
+1. Fork the following repositories:
+
+- https://github.com/KoehlerClem/ghost_platform
+- https://github.com/KoehlerClem/Ghost
+
+2. Initialize the submodules in the Ghost Repository:
 
         git submodule update --init --recursive
 
-3. Create a GitHub token with these permissions:
+3. Create a GitHub token with the permissions shown in the image below:
 
 ![Token Permissions](Documentation/TokenPermissions.png)
 
@@ -18,64 +32,63 @@ To get this project up and running on your own machine, follow these steps:
 
         ./deploy.sh <aws-profile> <GitHubOwner> <ghost-aws-infra-repo> <ghost-repo> <git-branch> <github-token>
         
-    for example: 
+    For example: 
         
         ./deploy.sh default KoehlerClem ghost_platform Ghost main abc123SecretToken
 
-    Only one branch per AWS account is supported. If you want to deploy multiple branches, you need to create a new AWS account for each branch.
+Note: Only one branch per AWS account is supported. If you want to deploy multiple branches, you will need to create a new AWS account for each branch.
 
-5. ☕️ Wait for about 30 minutes for the deployment to complete.
-6. In the AWS console go to the CloudFormation stack and look for the CloudFront output link. 
-7. Gost is now deployed and ready to use under the CloudFront URL!
+5. ☕️ Wait for the deployment to complete (this may take approximately 30 minutes).
+6. In the AWS console, go to the CloudFormation stack and find the CloudFront output link.
+7. Ghost is now deployed and ready to use at the CloudFront URL!
 
-### Use Delete Posts Lambda
+# 🔄 Updating the Code 
 
-Create a integration for the Posts Lambda in the Ghost admin panel:
+To update the AWS infrastructure or Ghost App, push your changes to the corresponding GitHub repository and branch you declared in the deploy script. The Codepipeline will automatically detect the changes and deploy the new version. 
 
-How To: https://ghost.org/docs/admin-api/#token-authentication
+On Pull request a CodeBuild will be run to test the changes. You can find an example pull request here: https://github.com/KoehlerClem/ghost_platform/pull/3
 
-1. Go to the Ghost admin panel and go to Settings
-
-![Lambda Integration](Documentation/integration1.png)
-2. Go to Integrations
-![Lambda Integration](Documentation/integration2.png)
-3. Click on "Add custom integration"
-![Lambda Integration](Documentation/integration3.png)
-4. Enter the name of the integration and Get the Admin API Key
-
-![Lambda Integration](Documentation/integration4.png)
-
-Got to ghost-blog-Lambda and create a test:
-
-    { 
-        "ghost_Admin_API_key": "YOUR_ADMIN_API_KEY_HERE" 
-    }
-
-Click Test to run the Lambda function.
-
-## 🛠️ Update the Codepipeline
+# 🛠️ Update the Codepipeline
 
 To update the Codepipelines set the AWS profile:
     
     export aws_profile=<aws-profile>
 
-Updating the AWS Infrastructure as Code Pipeline:
+Updating the Ghost AWS Cloudformation Pipeline:
 
     aws cloudformation deploy --template-file CICD/codepipeline_infra.yml --stack-name codepipeline-infra --capabilities CAPABILITY_IAM --profile $aws_profile
 
 Updating the Ghost App Codepipeline:
 
     aws cloudformation deploy --template-file CICD/codepipeline_app.yml --stack-name codepipeline-app --capabilities CAPABILITY_IAM --profile $aws_profile
+    
 
-## Updating the Ghost App
+# 🗑️ Use Delete Posts Lambda
 
-To update the Ghost app, simply push your changes to the Ghost GitHub repository. The Codepipeline will automatically detect the changes and deploy the new version of the Ghost app.
+The Lambda uses (Ghosts token authentication)[https://ghost.org/docs/admin-api/#token-authentication]
 
-## Updating the AWS Infrastructure
+To get a token, create a integration for the Posts Lambda in the Ghost admin panel:
 
-To update the AWS infrastructure, simply push your changes to the ghost_platform GitHub repository. The Codepipeline will automatically detect the changes and deploy the new version of the AWS infrastructure.
+1. Go to the Ghost admin panel and go to Settings.
 
-## 📝 Architecture Summary
+![Lambda Integration](Documentation/integration1.png)
+2. Go to Integrations.
+![Lambda Integration](Documentation/integration2.png)
+3. Click on "Add custom integration".
+![Lambda Integration](Documentation/integration3.png)
+4. Enter the name of the integration and get the Admin API Key
+
+![Lambda Integration](Documentation/integration4.png)
+
+In your AWS Console go to Lambdas and look for ghost-blog-Lambda. Create a test:
+
+    { 
+        "ghost_Admin_API_key": "YOUR_ADMIN_API_KEY_HERE" 
+    }
+
+Running the test will delete all posts.
+
+# 🏗️ Architecture Summary
 
 In the Ghost in the Cloud project, the Ghost platform is hosted in the cloud using the following architecture:
 
@@ -101,7 +114,9 @@ Overall, this architecture allows the Ghost platform to be hosted in the cloud w
 
 While the Ghost platform is hosted in the cloud, [the Ghost platform itself is not cloud-native](https://ghost.org/docs/faq/clustering-sharding-multi-server/). This means that the Ghost platform is not optimized for the cloud and does not take advantage of the cloud's scalability and elasticity. If the CDN is not enough to handle the traffic, we should consider scaling the database or Ghost platform vertically by increasing the CPU and memory of the task definition.
 
-## 📚 Architecture Slides
+# 📚 Architecture Slides
+
+For a visual overview of the Ghost in the Cloud project, check out the slides below:
 
 ![Ghost-Blog-AWS-Architecture.001](Documentation/Ghost-Blog-AWS-Architecture.001.png)
 ![Ghost-Blog-AWS-Architecture.002](Documentation/Ghost-Blog-AWS-Architecture.002.png)
