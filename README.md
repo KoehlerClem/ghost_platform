@@ -46,7 +46,7 @@ Note: Only one branch per AWS account is supported. If you want to deploy multip
 
 To update the AWS infrastructure or Ghost App, push your changes to the corresponding GitHub repository and branch you declared in the deploy script. The Codepipeline will automatically detect the changes and deploy the new version. 
 
-On Pull request a CodeBuild will be run to test the changes. You can find an example pull request here: https://github.com/KoehlerClem/ghost_platform/pull/3
+On Pull request a CodeBuild will be run to test the changes. You can find an example pull request here: https://github.com/KoehlerClem/ghost_platform/pull/4
 
 # 🛠️ Update the Codepipeline
 
