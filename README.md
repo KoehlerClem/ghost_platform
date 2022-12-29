@@ -4,6 +4,8 @@ Welcome to the Ghost in the Cloud project, a project that hosts the Ghost platfo
 
 # Table of Contents
 
+- [☁️ Ghost in the Cloud](#️-ghost-in-the-cloud)
+- [Table of Contents](#table-of-contents)
 - [💻 Installation](#-installation)
 - [🔄 Updating the Code](#-updating-the-code)
 - [🛠️ Update the Codepipeline](#️-update-the-codepipeline)
@@ -38,9 +40,9 @@ To set up this project on your own machine and AWS account, follow these steps:
 
 Note: Only one branch per AWS account is supported. If you want to deploy multiple branches, you will need to create a new AWS account for each branch.
 
-5. ☕️ Wait for the deployment to complete (this may take approximately 30 minutes).
-6. In the AWS console, go to the CloudFormation stack and find the CloudFront output link.
-7. Ghost is now deployed and ready to use at the CloudFront URL!
+1. ☕️ Wait for the deployment to complete (this may take approximately 30 minutes, the Ghost App pipeline will show a failure on the initial run, this is expected and can be ignored since the cluster is started at a later point).
+2. In the AWS console, go to the CloudFormation stack and find the CloudFront output link.
+3. Ghost is now deployed and ready to use at the CloudFront URL!
 
 # 🔄 Updating the Code 
 
