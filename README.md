@@ -128,3 +128,4 @@ For a visual overview of the Ghost in the Cloud project, check out the slides be
 ![Ghost-Blog-AWS-Architecture.008](Documentation/Ghost-Blog-AWS-Architecture.008.png)
 
 
+
