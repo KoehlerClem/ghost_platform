@@ -13,7 +13,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          GHOST_URL: !Join ['', ['http://', !ImportValue DistributionDomainName]]
+          GHOST_URL: !Join ['', ['http://', !ImportValue ELBDomainName]]
 
   LambdaRole:
     Type: AWS::IAM::Role

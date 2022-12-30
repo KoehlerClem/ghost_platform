@@ -32,6 +32,8 @@ Resources:
           Environment:
             - Name: url
               Value: !Join ['', ['http://', !ImportValue DistributionDomainName]]
+            - Name: admin
+              Value: !Join ['', ['http://', !ImportValue ELBDomainName]]
             - Name: database__connection__host
               Value: !ImportValue DBAddress
             - Name: database__connection__user
